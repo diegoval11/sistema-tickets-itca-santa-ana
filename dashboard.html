@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - ITCA FEPADE{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-neutral-100">DASHBOARD TÉCNICO</h1>
+        </div>
+        <a href="{% url 'export_tickets' %}" class="px-6 py-3 bg-secondary hover:bg-opacity-80 text-white font-semibold rounded-lg transition">
+            Exportar Reportes
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-neutral-400">Total Tickets</h3>
+                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+            <p class="text-3xl font-bold text-neutral-100">{{ total_tickets }}</p>
+            <p class="text-xs text-neutral-500 mt-1">Todos los tiempos</p>
+        </div>
+
+        <div class="bg-neutral-900 border border-blue-800 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-blue-400">Abiertos</h3>
+                <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <p class="text-3xl font-bold text-blue-300">{{ open_tickets }}</p>
+            <p class="text-xs text-neutral-500 mt-1">Requieren atención</p>
+        </div>
+
+        <div class="bg-neutral-900 border border-yellow-800 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-yellow-400">En Progreso</h3>
+                <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+            </div>
+            <p class="text-3xl font-bold text-yellow-300">{{ in_progress_tickets }}</p>
+            <p class="text-xs text-neutral-500 mt-1">En atención</p>
+        </div>
+
+        <div class="bg-neutral-900 border border-green-800 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-medium text-green-400">Cerrados</h3>
+                <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <p class="text-3xl font-bold text-green-300">{{ closed_tickets }}</p>
+            <p class="text-xs text-neutral-500 mt-1">Resueltos</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+            <h3 class="text-sm font-medium text-neutral-400 mb-2">Tiempo Promedio de Resolución</h3>
+            <p class="text-2xl font-bold text-primary">{{ avg_resolution_hours }} hrs</p>
+        </div>
+
+        <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+            <h3 class="text-sm font-medium text-neutral-400 mb-2">Tickets Este Mes</h3>
+            <p class="text-2xl font-bold text-primary">{{ tickets_this_month }}</p>
+        </div>
+
+        <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+            <h3 class="text-sm font-medium text-neutral-400 mb-2">Tickets Este Trimestre</h3>
+            <p class="text-2xl font-bold text-primary">{{ tickets_this_quarter }}</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-neutral-100 mb-4">Tickets por Categoría</h3>
+            <div class="space-y-3">
+                {% for item in tickets_by_category %}
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-neutral-300">{{ item.category }}</span>
+                        <span class="text-neutral-400">{{ item.count }}</span>
+                    </div>
+                    <div class="w-full bg-neutral-800 rounded-full h-2">
+                        <div class="bg-primary rounded-full h-2" style="width: {% widthratio item.count total_tickets 100 %}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-neutral-100 mb-4">Tickets por Prioridad</h3>
+            <div class="space-y-3">
+                {% for item in tickets_by_priority %}
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span class="text-neutral-300">{{ item.priority }}</span>
+                        <span class="text-neutral-400">{{ item.count }}</span>
+                    </div>
+                    <div class="w-full bg-neutral-800 rounded-full h-2">
+                        {% if item.priority == 'ALTA' %}
+                        <div class="bg-red-500 rounded-full h-2" style="width: {% widthratio item.count total_tickets 100 %}%"></div>
+                        {% elif item.priority == 'MEDIA' %}
+                        <div class="bg-yellow-500 rounded-full h-2" style="width: {% widthratio item.count total_tickets 100 %}%"></div>
+                        {% else %}
+                        <div class="bg-green-500 rounded-full h-2" style="width: {% widthratio item.count total_tickets 100 %}%"></div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-neutral-100 mb-4">Resumen por Estado</h3>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="text-center p-4 bg-neutral-800 rounded-lg">
+                <p class="text-2xl font-bold text-blue-400">{{ open_tickets }}</p>
+                <p class="text-sm text-neutral-400 mt-1">Abiertos</p>
+            </div>
+            <div class="text-center p-4 bg-neutral-800 rounded-lg">
+                <p class="text-2xl font-bold text-yellow-400">{{ in_progress_tickets }}</p>
+                <p class="text-sm text-neutral-400 mt-1">En Progreso</p>
+            </div>
+            <div class="text-center p-4 bg-neutral-800 rounded-lg">
+                <p class="text-2xl font-bold text-red-400">{{ rejected_tickets }}</p>
+                <p class="text-sm text-neutral-400 mt-1">Rechazados</p>
+            </div>
+            <div class="text-center p-4 bg-neutral-800 rounded-lg">
+                <p class="text-2xl font-bold text-green-400">{{ closed_tickets }}</p>
+                <p class="text-sm text-neutral-400 mt-1">Cerrados</p>
+            </div>
+            <div class="text-center p-4 bg-neutral-800 rounded-lg">
+                <p class="text-2xl font-bold text-neutral-400">{{ archived_tickets }}</p>
+                <p class="text-sm text-neutral-400 mt-1">Archivados</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-neutral-100 mb-4">Filtrar Tickets</h3>
+        <form method="get" class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-[150px]">
+                <label class="block text-sm font-medium text-neutral-300 mb-2">Estado</label>
+                <select name="status" class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-neutral-100">
+                    <option value="">Todos</option>
+                    <option value="ABIERTO" {% if status_filter == 'ABIERTO' %}selected{% endif %}>Abierto</option>
+                    <option value="EN_PROGRESO" {% if status_filter == 'EN_PROGRESO' %}selected{% endif %}>En Progreso</option>
+                    <option value="RECHAZADO" {% if status_filter == 'RECHAZADO' %}selected{% endif %}>Rechazado</option>
+                    <option value="CERRADO" {% if status_filter == 'CERRADO' %}selected{% endif %}>Cerrado</option>
+                    <option value="ARCHIVADO" {% if status_filter == 'ARCHIVADO' %}selected{% endif %}>Archivado</option>
+                </select>
+            </div>
+            
+            <div class="flex-1 min-w-[150px]">
+                <label class="block text-sm font-medium text-neutral-300 mb-2">Prioridad</label>
+                <select name="priority" class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-neutral-100">
+                    <option value="">Todas</option>
+                    <option value="ALTA" {% if priority_filter == 'ALTA' %}selected{% endif %}>Alta</option>
+                    <option value="MEDIA" {% if priority_filter == 'MEDIA' %}selected{% endif %}>Media</option>
+                    <option value="BAJA" {% if priority_filter == 'BAJA' %}selected{% endif %}>Baja</option>
+                </select>
+            </div>
+
+            <div class="flex-1 min-w-[150px]">
+                <label class="block text-sm font-medium text-neutral-300 mb-2">Categoría</label>
+                <select name="category" class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-neutral-100">
+                    <option value="">Todas</option>
+                    <option value="COMPUTADORA" {% if category_filter == 'COMPUTADORA' %}selected{% endif %}>Computadora</option>
+                    <option value="IMPRESORA" {% if category_filter == 'IMPRESORA' %}selected{% endif %}>Impresora</option>
+                    <option value="SOFTWARE" {% if category_filter == 'SOFTWARE' %}selected{% endif %}>Software</option>
+                    <option value="RED" {% if category_filter == 'RED' %}selected{% endif %}>Red</option>
+                    <option value="ACCESO" {% if category_filter == 'ACCESO' %}selected{% endif %}>Acceso</option>
+                    <option value="OTRO" {% if category_filter == 'OTRO' %}selected{% endif %}>Otro</option>
+                </select>
+            </div>
+            
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-neutral-300 mb-2">Buscar</label>
+                <input type="text" name="search" value="{{ search_query }}" placeholder="Número, usuario..." class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-neutral-100">
+            </div>
+            
+            <div class="flex items-end">
+                <button type="submit" class="px-6 py-3 bg-primary hover:bg-opacity-90 text-neutral-900 font-semibold rounded-lg transition">
+                    Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden">
+        <div class="p-6 border-b border-neutral-800">
+            <h3 class="text-lg font-semibold text-neutral-100">Tickets Recientes</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-neutral-800">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-neutral-300">Número</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-neutral-300">Usuario</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-neutral-300">Categoría</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-neutral-300">Prioridad</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-neutral-300">Estado</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-neutral-300">Fecha</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold text-neutral-300">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-neutral-800">
+                    {% for ticket in tickets %}
+                    <tr class="hover:bg-neutral-800 transition">
+                        <td class="px-6 py-4">
+                            <code class="text-primary text-sm">{{ ticket.ticket_number }}</code>
+                        </td>
+                        <td class="px-6 py-4 text-neutral-300">{{ ticket.user.get_full_name }}</td>
+                        <td class="px-6 py-4 text-neutral-300">{{ ticket.get_category_display }}</td>
+                        <td class="px-6 py-4">
+                            {% if ticket.priority == 'ALTA' %}
+                                <span class="px-2 py-1 bg-red-900 text-red-300 rounded text-xs">Alta</span>
+                            {% elif ticket.priority == 'MEDIA' %}
+                                <span class="px-2 py-1 bg-yellow-900 text-yellow-300 rounded text-xs">Media</span>
+                            {% else %}
+                                <span class="px-2 py-1 bg-green-900 text-green-300 rounded text-xs">Baja</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if ticket.status == 'ABIERTO' %}
+                                <span class="px-2 py-1 bg-blue-900 text-blue-300 rounded text-xs">Abierto</span>
+                            {% elif ticket.status == 'EN_PROGRESO' %}
+                                <span class="px-2 py-1 bg-yellow-900 text-yellow-300 rounded text-xs">En Progreso</span>
+                            {% elif ticket.status == 'RECHAZADO' %}
+                                <span class="px-2 py-1 bg-red-900 text-red-300 rounded text-xs">Rechazado</span>
+                            {% elif ticket.status == 'CERRADO' %}
+                                <span class="px-2 py-1 bg-green-900 text-green-300 rounded text-xs">Cerrado</span>
+                            {% else %}
+                                <span class="px-2 py-1 bg-neutral-700 text-neutral-400 rounded text-xs">Archivado</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-neutral-400 text-sm">{{ ticket.created_at|date:"d/m/Y" }}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2">
+                                <a href="{% url 'ticket_detail' ticket.id %}" class="px-3 py-1 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 rounded text-sm transition">
+                                    Ver
+                                </a>
+                                <a href="{% url 'update_ticket' ticket.id %}" class="px-3 py-1 bg-primary hover:bg-opacity-90 text-neutral-900 rounded text-sm transition">
+                                    Actualizar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-8 text-center text-neutral-400">
+                            No hay tickets que coincidan con los filtros.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
