@@ -1,0 +1,16 @@
+# Entornos virtuales
+.venv/
+venv/
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Base de datos local (opcional: se commitea copia demo en db.sqlite3)
+staticfiles/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
