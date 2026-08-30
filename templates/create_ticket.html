@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Ticket - ITCA FEPADE{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+    <!-- Header -->
+    <div>
+        <h1 class="text-3xl font-bold text-neutral-100">Nuevo Ticket</h1>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-8">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                    Descripción del Problema *
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.description.errors.0 }}</p>
+                {% endif %}
+                <p class="mt-1 text-xs text-neutral-500">Describe el problema con el mayor detalle posible</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                        Categoría *
+                    </label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ form.category.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.priority.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                        Prioridad *
+                    </label>
+                    {{ form.priority }}
+                    {% if form.priority.errors %}
+                        <p class="mt-1 text-sm text-red-400">{{ form.priority.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <label for="{{ form.affected_equipment.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                    Equipo Afectado *
+                </label>
+                {{ form.affected_equipment }}
+                {% if form.affected_equipment.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.affected_equipment.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.serial_number.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                    Número de Serie (Opcional)
+                </label>
+                {{ form.serial_number }}
+                {% if form.serial_number.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.serial_number.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Manual file input for multiple photos -->
+            <div>
+                <label for="photos" class="block text-sm font-medium text-neutral-300 mb-2">
+                    Fotos (Opcional)
+                </label>
+                <input 
+                    type="file" 
+                    name="photos" 
+                    id="photos" 
+                    multiple 
+                    accept="image/jpeg,image/png"
+                    class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-neutral-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-neutral-900 hover:file:bg-opacity-90"
+                >
+                <p class="mt-1 text-xs text-neutral-500">Máximo 5 fotos, JPG/PNG, 5MB cada una</p>
+            </div>
+
+            <div class="p-4 bg-neutral-800 border border-neutral-700 rounded-lg">
+                <p class="text-sm text-neutral-300">
+                    <strong>Nota:</strong> Recibirás notificaciones por correo y en la aplicación sobre el estado de tu ticket.
+                </p>
+            </div>
+
+            <div class="flex gap-4">
+                <button type="submit" class="flex-1 py-3 bg-primary hover:bg-opacity-90 text-neutral-900 font-semibold rounded-lg transition">
+                    Crear Ticket
+                </button>
+                <a href="{% url 'my_tickets' %}" class="flex-1 py-3 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 font-semibold rounded-lg text-center transition">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

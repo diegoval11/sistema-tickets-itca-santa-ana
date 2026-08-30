@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Usuario - ITCA FEPADE{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+    <div>
+        <h1 class="text-3xl font-bold text-neutral-100">Crear Nuevo Usuario</h1>
+        <p class="text-neutral-400 mt-1">El sistema generará un código de acceso automáticamente</p>
+    </div>
+
+     <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-8">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                    Nombre *
+                </label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.first_name.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                    Apellido *
+                </label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.last_name.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.institutional_email.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                    Correo Institucional *
+                </label>
+                {{ form.institutional_email }}
+                {% if form.institutional_email.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.institutional_email.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                    Nombre de Usuario *
+                </label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.username.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="p-4 bg-neutral-800 border border-neutral-700 rounded-lg">
+                <p class="text-sm text-neutral-300">
+                    <strong>Nota:</strong> El sistema generará automáticamente un código de acceso único y lo enviará al correo institucional del usuario.
+                </p>
+            </div>
+
+            <div class="flex gap-4">
+                <button type="submit" class="flex-1 py-3 bg-primary hover:bg-opacity-90 text-neutral-900 font-semibold rounded-lg transition">
+                    Crear Usuario
+                </button>
+                <a href="{% url 'user_management' %}" class="flex-1 py-3 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 font-semibold rounded-lg text-center transition">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

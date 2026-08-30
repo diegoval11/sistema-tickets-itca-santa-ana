@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Actualizar Ticket {{ ticket.ticket_number }} - ITCA FEPADE{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+    <div>
+        <h1 class="text-3xl font-bold text-neutral-100">Actualizar Ticket {{ ticket.ticket_number }}</h1>
+        <p class="text-neutral-400 mt-1">Gestiona el estado y detalles del ticket</p>
+    </div>
+
+    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-neutral-100 mb-4">Información Actual</h2>
+        <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+                <p class="text-neutral-400">Usuario</p>
+                <p class="text-neutral-100">{{ ticket.user.get_full_name }}</p>
+            </div>
+            <div>
+                <p class="text-neutral-400">Categoría</p>
+                <p class="text-neutral-100">{{ ticket.get_category_display }}</p>
+            </div>
+            <div>
+                <p class="text-neutral-400">Prioridad</p>
+                <p class="text-neutral-100">{{ ticket.get_priority_display }}</p>
+            </div>
+            <div>
+                <p class="text-neutral-400">Estado Actual</p>
+                <p class="text-neutral-100">{{ ticket.get_status_display }}</p>
+            </div>
+        </div>
+        <div class="mt-4">
+            <p class="text-neutral-400 text-sm mb-1">Descripción</p>
+            <p class="text-neutral-100">{{ ticket.description }}</p>
+        </div>
+    </div>
+
+    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-8">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                    Estado *
+                </label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.status.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="p-4 bg-neutral-800 border border-neutral-700 rounded-lg">
+                <h3 class="font-semibold text-neutral-100 mb-2">Programar Visita (Opcional)</h3>
+                <p class="text-sm text-neutral-400 mb-4">Si cambias el estado a "En Progreso", puedes programar una visita</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="{{ form.visit_date.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                            Fecha de Visita
+                        </label>
+                        {{ form.visit_date }}
+                    </div>
+                    <div>
+                        <label for="{{ form.visit_time.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                            Hora de Visita
+                        </label>
+                        {{ form.visit_time }}
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label for="{{ form.rejection_reason.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                    Motivo de Rechazo
+                </label>
+                {{ form.rejection_reason }}
+                {% if form.rejection_reason.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.rejection_reason.errors.0 }}</p>
+                {% endif %}
+                <p class="mt-1 text-xs text-neutral-500">Requerido si cambias el estado a "Rechazado"</p>
+            </div>
+
+            <div>
+                <label for="{{ form.closure_note.id_for_label }}" class="block text-sm font-medium text-neutral-300 mb-2">
+                    Nota de Cierre
+                </label>
+                {{ form.closure_note }}
+                {% if form.closure_note.errors %}
+                    <p class="mt-1 text-sm text-red-400">{{ form.closure_note.errors.0 }}</p>
+                {% endif %}
+                <p class="mt-1 text-xs text-neutral-500">Opcional al cerrar el ticket</p>
+            </div>
+
+            <div class="p-4 bg-blue-900 border border-blue-700 rounded-lg">
+                <p class="text-sm text-blue-100">
+                    <strong>Nota:</strong> El usuario recibirá una notificación por correo y en la aplicación sobre cualquier cambio de estado.
+                </p>
+            </div>
+
+            <div class="flex gap-4">
+                <button type="submit" class="flex-1 py-3 bg-primary hover:bg-opacity-90 text-neutral-900 font-semibold rounded-lg transition">
+                    Actualizar Ticket
+                </button>
+                <a href="{% url 'ticket_detail' ticket.id %}" class="flex-1 py-3 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 font-semibold rounded-lg text-center transition">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

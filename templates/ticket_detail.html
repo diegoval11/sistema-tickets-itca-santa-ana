@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Ticket {{ ticket.ticket_number }} - ITCA FEPADE{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-neutral-100">{{ ticket.ticket_number }}</h1>
+            <p class="text-neutral-400 mt-1">Creado el {{ ticket.created_at|date:"d/m/Y H:i" }} · {{ ticket.get_category_display }}</p>
+        </div>
+        {% if user.role == 'TECNICO' %}
+        <a href="{% url 'update_ticket' ticket.id %}" class="px-6 py-3 bg-primary hover:bg-opacity-90 text-neutral-900 font-semibold rounded-lg transition">
+            Actualizar Ticket
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <h2 class="text-xl font-semibold text-neutral-100">Información del Ticket</h2>
+                    {% if ticket.status == 'ABIERTO' %}
+                        <span class="px-3 py-1 bg-blue-900 text-blue-300 rounded-full text-sm">Abierto</span>
+                    {% elif ticket.status == 'EN_PROGRESO' %}
+                        <span class="px-3 py-1 bg-yellow-900 text-yellow-300 rounded-full text-sm">En Progreso</span>
+                    {% elif ticket.status == 'RECHAZADO' %}
+                        <span class="px-3 py-1 bg-red-900 text-red-300 rounded-full text-sm">Rechazado</span>
+                    {% elif ticket.status == 'CERRADO' %}
+                        <span class="px-3 py-1 bg-green-900 text-green-300 rounded-full text-sm">Cerrado</span>
+                    {% elif ticket.status == 'ARCHIVADO' %}
+                        <span class="px-3 py-1 bg-neutral-700 text-neutral-400 rounded-full text-sm">Archivado</span>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-sm font-medium text-neutral-400 mb-1">Descripción</h3>
+                        <p class="text-neutral-100">{{ ticket.description }}</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <h3 class="text-sm font-medium text-neutral-400 mb-1">Categoría</h3>
+                            <p class="text-neutral-100">{{ ticket.get_category_display }}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-neutral-400 mb-1">Prioridad</h3>
+                            <p class="text-neutral-100">{{ ticket.get_priority_display }}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-medium text-neutral-400 mb-1">Equipo Afectado</h3>
+                        <p class="text-neutral-100">{{ ticket.affected_equipment }}</p>
+                    </div>
+
+                    {% if ticket.serial_number %}
+                    <div>
+                        <h3 class="text-sm font-medium text-neutral-400 mb-1">Número de Serie</h3>
+                        <p class="text-neutral-100">{{ ticket.serial_number }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if ticket.visit_date %}
+                    <div class="p-4 bg-yellow-900 border border-yellow-700 rounded-lg">
+                        <h3 class="text-sm font-medium text-yellow-300 mb-1">Visita Programada</h3>
+                        <p class="text-yellow-100">{{ ticket.visit_date|date:"d/m/Y" }} a las {{ ticket.visit_time|time:"H:i" }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if ticket.rejection_reason %}
+                    <div class="p-4 bg-red-900 border border-red-700 rounded-lg">
+                        <h3 class="text-sm font-medium text-red-300 mb-1">Motivo de Rechazo</h3>
+                        <p class="text-red-100">{{ ticket.rejection_reason }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if ticket.closure_note %}
+                    <div class="p-4 bg-green-900 border border-green-700 rounded-lg">
+                        <h3 class="text-sm font-medium text-green-300 mb-1">Nota de Cierre</h3>
+                        <p class="text-green-100">{{ ticket.closure_note }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if attachments %}
+            <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-neutral-100 mb-4">Fotos Adjuntas</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {% for attachment in attachments %}
+                    <a href="{{ attachment.image.url }}" target="_blank" class="block">
+                        <img src="{{ attachment.image.url }}" alt="Attachment" class="w-full h-32 object-cover rounded-lg border border-neutral-700 hover:border-primary transition">
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+                <h2 class="text-xl font-semibold text-neutral-100 mb-4">Historial de Cambios</h2>
+                <div class="space-y-4">
+                    {% for entry in history %}
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-2 bg-primary rounded-full"></div>
+                        <div class="flex-1 pb-4">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-medium text-neutral-100">{{ entry.get_action_display }}</span>
+                                <span class="text-sm text-neutral-500">{{ entry.timestamp|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            {% if entry.user %}
+                            <p class="text-sm text-neutral-400 mb-1">Por: {{ entry.user.get_full_name }}</p>
+                            {% endif %}
+                            {% if entry.comment %}
+                            <p class="text-neutral-300">{{ entry.comment }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+                <h2 class="text-lg font-semibold text-neutral-100 mb-4">Usuario</h2>
+                <div class="space-y-2">
+                    <p class="text-neutral-300">{{ ticket.user.get_full_name }}</p>
+                    <p class="text-sm text-neutral-400">{{ ticket.user.institutional_email }}</p>
+                </div>
+            </div>
+
+            <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+                <h2 class="text-lg font-semibold text-neutral-100 mb-4">Estadísticas</h2>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-sm text-neutral-400">Creado</p>
+                        <p class="text-neutral-100">{{ ticket.created_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-neutral-400">Última actualización</p>
+                        <p class="text-neutral-100">{{ ticket.updated_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    {% if ticket.closed_at %}
+                    <div>
+                        <p class="text-sm text-neutral-400">Cerrado</p>
+                        <p class="text-neutral-100">{{ ticket.closed_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

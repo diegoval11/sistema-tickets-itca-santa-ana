@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Notificaciones - ITCA FEPADE{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div>
+        <h1 class="text-3xl font-bold text-neutral-100">Notificaciones</h1>
+        <p class="text-neutral-400 mt-1">Mantente al tanto de los cambios y novedades de tus tickets</p>
+    </div>
+
+    <div class="space-y-4">
+        {% for notification in notifications %}
+        <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6 {% if not notification.is_read %}border-l-4 border-l-primary{% endif %}">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                        <h3 class="text-lg font-semibold text-neutral-100">{{ notification.title }}</h3>
+                        {% if not notification.is_read %}
+                            <span class="px-2 py-1 bg-primary text-neutral-900 rounded text-xs font-semibold">Nueva</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-neutral-300 mb-3">{{ notification.message }}</p>
+                    <div class="flex items-center gap-4 text-sm text-neutral-500">
+                        <span>{{ notification.created_at|date:"d/m/Y H:i" }}</span>
+                        {% if notification.ticket %}
+                            <a href="{% url 'ticket_detail' notification.ticket.id %}" class="text-primary hover:underline">
+                                Ver Ticket {{ notification.ticket.ticket_number }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if not notification.is_read %}
+                <a href="{% url 'mark_notification_read' notification.id %}" class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-neutral-200 rounded text-sm transition">
+                    Marcar como leída
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-12 text-center">
+            <svg class="w-16 h-16 text-neutral-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <p class="text-neutral-400">No tienes notificaciones</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

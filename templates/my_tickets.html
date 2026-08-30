@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Mis Tickets - ITCA FEPADE{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-neutral-100">Mis Tickets</h1>
+            <p class="text-neutral-400 mt-1">Consulta el estado y avance de tus solicitudes de soporte</p>
+        </div>
+        <a href="{% url 'create_ticket' %}" class="px-6 py-3 bg-primary hover:bg-opacity-90 text-neutral-900 font-semibold rounded-lg transition">
+            + Crear Ticket
+        </a>
+    </div>
+
+     
+    <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-6">
+        <form method="get" class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-neutral-300 mb-2">Estado</label>
+                <select name="status" class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-neutral-100">
+                    <option value="">Todos</option>
+                    <option value="ABIERTO" {% if status_filter == 'ABIERTO' %}selected{% endif %}>Abierto</option>
+                    <option value="EN_PROGRESO" {% if status_filter == 'EN_PROGRESO' %}selected{% endif %}>En Progreso</option>
+                    <option value="RECHAZADO" {% if status_filter == 'RECHAZADO' %}selected{% endif %}>Rechazado</option>
+                    <option value="CERRADO" {% if status_filter == 'CERRADO' %}selected{% endif %}>Cerrado</option>
+                    <option value="ARCHIVADO" {% if status_filter == 'ARCHIVADO' %}selected{% endif %}>Archivado</option>
+                </select>
+            </div>
+            
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-neutral-300 mb-2">Buscar</label>
+                <input type="text" name="search" value="{{ search_query }}" placeholder="Número o descripción..." class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-neutral-100">
+            </div>
+            
+            <div class="flex items-end">
+                <button type="submit" class="px-6 py-3 bg-secondary hover:bg-opacity-80 text-white rounded-lg transition">
+                    Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="space-y-4">
+        {% for ticket in tickets %}
+        <a href="{% url 'ticket_detail' ticket.id %}" class="block bg-neutral-900 border border-neutral-800 rounded-lg p-6 hover:border-primary transition">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                        <h3 class="text-xl font-semibold text-neutral-100">{{ ticket.ticket_number }}</h3>
+                        {% if ticket.status == 'ABIERTO' %}
+                            <span class="px-3 py-1 bg-blue-900 text-blue-300 rounded-full text-sm">Abierto</span>
+                        {% elif ticket.status == 'EN_PROGRESO' %}
+                            <span class="px-3 py-1 bg-yellow-900 text-yellow-300 rounded-full text-sm">En Progreso</span>
+                        {% elif ticket.status == 'RECHAZADO' %}
+                            <span class="px-3 py-1 bg-red-900 text-red-300 rounded-full text-sm">Rechazado</span>
+                        {% elif ticket.status == 'CERRADO' %}
+                            <span class="px-3 py-1 bg-green-900 text-green-300 rounded-full text-sm">Cerrado</span>
+                        {% elif ticket.status == 'ARCHIVADO' %}
+                            <span class="px-3 py-1 bg-neutral-700 text-neutral-400 rounded-full text-sm">Archivado</span>
+                        {% endif %}
+                        
+                        {% if ticket.priority == 'ALTA' %}
+                            <span class="px-2.5 py-1 bg-red-900 text-red-300 rounded-full text-xs">Alta</span>
+                        {% elif ticket.priority == 'MEDIA' %}
+                            <span class="px-2.5 py-1 bg-yellow-900 text-yellow-300 rounded-full text-xs">Media</span>
+                        {% else %}
+                            <span class="px-2.5 py-1 bg-green-900 text-green-300 rounded-full text-xs">Baja</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-neutral-300 mb-3">{{ ticket.get_short_description }}</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-6 text-sm text-neutral-500">
+                <span>{{ ticket.get_category_display }}</span>
+                <span>{{ ticket.affected_equipment }}</span>
+                <span>{{ ticket.created_at|date:"d/m/Y H:i" }}</span>
+            </div>
+        </a>
+        {% empty %}
+        <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-12 text-center">
+            <svg class="w-16 h-16 text-neutral-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <p class="text-neutral-400 mb-4">No tienes tickets</p>
+            <a href="{% url 'create_ticket' %}" class="inline-block px-6 py-3 bg-primary hover:bg-opacity-90 text-neutral-900 font-semibold rounded-lg transition">
+                Crear tu primer ticket
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
